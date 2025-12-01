@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/joelhooks-logseq-mcp-tools-badge.png)](https://mseep.ai/app/joelhooks-logseq-mcp-tools)
+
 # Logseq MCP Tools
 
 [![smithery badge](https://smithery.ai/badge/@joelhooks/logseq-mcp-tools)](https://smithery.ai/server/@joelhooks/logseq-mcp-tools)
