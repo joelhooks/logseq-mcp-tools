@@ -146,8 +146,15 @@ function dateToJournalDay(date: Date): number {
 }
 
 // Helper function to convert Logseq journalDay format (YYYYMMDD) to Date
-function journalDayToDate(journalDay: number): Date {
+function journalDayToDate(journalDay: number): Date | null {
     const str = journalDay.toString()
+
+    // Validate that the input has exactly 8 digits
+    if (str.length !== 8 || !/^\d{8}$/.test(str)) {
+        console.warn(`Invalid journalDay format: ${journalDay}. Expected format: YYYYMMDD (8 digits)`)
+        return null
+    }
+
     const year = parseInt(str.substring(0, 4))
     const month = parseInt(str.substring(4, 6)) - 1 // Month is 0-indexed
     const day = parseInt(str.substring(6, 8))
@@ -411,6 +418,7 @@ server.tool(
             const journalPages = pages.filter((page: any) => {
                 return (
                     page['journal?'] === true &&
+                    typeof page.journalDay === 'number' &&
                     page.journalDay >= startJournalDay &&
                     page.journalDay <= endJournalDay
                 )
@@ -1351,6 +1359,7 @@ server.tool(
 
             const journalPages = pages.filter((page: any) => {
                 if (!page['journal?']) return false
+                if (page.journalDay == null) return false
                 return page.journalDay >= startJournalDay && page.journalDay <= endJournalDay
             })
 
@@ -1379,7 +1388,12 @@ server.tool(
                 const content = await getPageContent(page.name)
                 if (!content) continue
 
-                const date = journalDayToDate(page.journalDay).toISOString().split('T')[0]
+                const dateObj = journalDayToDate(page.journalDay)
+                if (!dateObj) {
+                    console.warn(`Skipping journal page with invalid journalDay: ${page.journalDay}`)
+                    continue
+                }
+                const date = dateObj.toISOString().split('T')[0]
                 topicsByDate[date] = new Set()
 
                 const processBlocks = (blocks: any[]) => {
